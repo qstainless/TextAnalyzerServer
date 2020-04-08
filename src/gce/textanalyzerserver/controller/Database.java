@@ -11,7 +11,7 @@ import java.util.StringTokenizer;
  * Requirements:
  * 1. The MySQL Java Connector is properly included in the project's libraries
  * 2. Will connect to host:localhost at default MySQL port 3306
- * 3. Assumes that a user exists with username/passwrd textanalyzer/textanalyzer
+ * 3. Assumes that a user exists with username/password textanalyzer/textanalyzer
  */
 public class Database {
     private static Connection dbConnection;
