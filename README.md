@@ -1,4 +1,5 @@
 # TextAnalyzer Server
+Go to [TextAnalyzer Client](https://github.com/qstainless/TextAnalyzerClient).
 
 ## Overview
 
