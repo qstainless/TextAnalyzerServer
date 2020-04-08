@@ -28,6 +28,8 @@ The program assumes that an existing database user with all database privileges 
 ## Installation.
 
 ## Known Issues
+(See [Known Issues](https://github.com/qstainless/TextAnalyzerClient#known-issues) in TextAnalyzerClient).
+
 Not all HTML files are created equal. The program's code to convert HTML files to plain text is still rudimentary, as it is unable to identify HTML tag properties in lines without opening or closing tags.
 
 For example, in the following code:
