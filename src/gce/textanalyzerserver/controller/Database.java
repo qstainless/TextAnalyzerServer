@@ -79,6 +79,11 @@ public class Database {
                 while (wordsInLine.hasMoreTokens()) {
                     String word = wordsInLine.nextToken();
 
+                    // Limit word length to 255 characters
+                    if (word.length() > 254) {
+                        word = word.substring(0, 254);
+                    }
+
                     sql = "SELECT `wordFrequency` FROM " + databaseTable + " WHERE `wordContent`= '" + word.replace("'", "\\'") + "'";
 
                     Statement statement = dbConnection.createStatement();
@@ -115,7 +120,6 @@ public class Database {
 
     /**
      * Reads all word/frequency pairs from the database.
-     *
      */
     public static ResultSet getAllWords() {
         Statement statement = null;
@@ -205,7 +209,7 @@ public class Database {
 
             // Create the table if it does not already exist
             sql = "CREATE TABLE IF NOT EXISTS " + databaseTable + " (" +
-                    "`wordContent` VARCHAR(64) NOT NULL, " +
+                    "`wordContent` VARCHAR(255) NOT NULL, " +
                     "`wordFrequency` INT(11) NOT NULL, " +
                     "UNIQUE INDEX `wordContent_unique` (`wordContent`)" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
