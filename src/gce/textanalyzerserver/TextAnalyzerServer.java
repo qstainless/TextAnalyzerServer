@@ -38,10 +38,10 @@ public class TextAnalyzerServer {
                     // Open the socket to accept requests
                     Socket socket = serverSocket.accept();
 
-                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    ObjectInputStream serverIn = new ObjectInputStream(socket.getInputStream());
 
                     // Received the URL from the client
-                    String targetUrl = (String) in.readObject();
+                    String targetUrl = (String) serverIn.readObject();
                     System.out.println("\n<== Request received. URL location of file to be parsed: " + targetUrl);
 
                     // Connect to the database. Create the schema if it does not already exist.
@@ -56,10 +56,10 @@ public class TextAnalyzerServer {
 
                     System.out.println("\nDone parsing URL.");
 
-                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                    ObjectOutputStream serverOut = new ObjectOutputStream(socket.getOutputStream());
 
-                    out.writeObject(uniqueWords);
-                    out.writeObject(totalWords);
+                    serverOut.writeObject(uniqueWords);
+                    serverOut.writeObject(totalWords);
 
                     // Query the database for the word pairs
                     ResultSet wordPairs = Database.getAllWords();
@@ -74,8 +74,8 @@ public class TextAnalyzerServer {
                     while (wordPairs.next()) {
                         String wordContent = wordPairs.getString("wordContent");
                         int wordFrequency = wordPairs.getInt("wordFrequency");
-                        out.writeObject(wordContent);
-                        out.writeObject(wordFrequency);
+                        serverOut.writeObject(wordContent);
+                        serverOut.writeObject(wordFrequency);
                         System.out.println(++rank + ". " + wordContent + " (" + wordFrequency + ")");
                     }
 
@@ -84,8 +84,8 @@ public class TextAnalyzerServer {
                     System.out.println("\nUnique words: " + uniqueWords + "  Total words: " + totalWords);
                     System.out.println("\n==> Data sent to client. Server ready for next request.");
 
-                    in.close();
-                    out.close();
+                    serverIn.close();
+                    serverOut.close();
                     socket.close();
 
                     // It never gets to this point as it continues to loop after only
@@ -97,6 +97,8 @@ public class TextAnalyzerServer {
                     System.out.println(e.toString());
                 }
             }
+
+            serverSocket.close();
         } catch (IOException e) {
             System.out.println(e.toString());
         }
