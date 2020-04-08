@@ -94,13 +94,13 @@ public class TextAnalyzerServer {
                         break;
                     }
                 } catch (IOException e) {
-                    System.out.println(e.toString());
+                    e.printStackTrace();
                 }
             }
 
             serverSocket.close();
         } catch (IOException e) {
-            System.out.println(e.toString());
+            e.printStackTrace();
         }
     }
 }

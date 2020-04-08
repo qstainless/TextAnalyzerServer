@@ -206,7 +206,6 @@ public class Database {
 
             statement.close();
         } catch (SQLException se) {
-            System.out.println(se.toString());
             se.printStackTrace();
         } finally {
             try {
