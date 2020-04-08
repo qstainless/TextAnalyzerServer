@@ -42,10 +42,11 @@ public class Database {
                 dbConnection = DriverManager.getConnection(connectionUrl, databaseUser, databasePass);
             } catch (SQLException ex) {
                 System.out.println("Failed to create the database connection.");
-                System.out.println(ex.toString());
+                ex.printStackTrace();
             }
         } catch (ClassNotFoundException ex) {
             System.out.println("Driver not found.");
+            ex.printStackTrace();
         }
 
         return dbConnection;
@@ -55,74 +56,84 @@ public class Database {
      * Stores words found in the target URL and their frequencies in the database
      *
      * @param urlContent The content of the target URL
-     * @throws SQLException If an SQL exception occurs
-     * @throws IOException  If an IO exception occurs
      */
-    public static void storeWordsIntoDatabase(BufferedReader urlContent) throws SQLException, IOException {
-        // Open a connection to the database
-        dbConnection = dbConnect(databaseName);
+    public static void storeWordsIntoDatabase(BufferedReader urlContent) {
+        try {
+            // Open a connection to the database
+            dbConnection = dbConnect(databaseName);
 
-        PreparedStatement preparedStatement;
+            PreparedStatement preparedStatement;
 
-        // Temporary string to store each line of the buffered urlContent
-        String inputLine;
+            // Temporary string to store each line of the buffered urlContent
+            String inputLine;
 
-        // Add words and their frequency to the database
-        while ((inputLine = urlContent.readLine()) != null) {
-            // convert the html formatted line to plain text
-            String filteredInputLine = TextAnalyzerServerController.htmlToText(inputLine);
+            // Add words and their frequency to the database
+            while ((inputLine = urlContent.readLine()) != null) {
+                // convert the html formatted line to plain text
+                String filteredInputLine = TextAnalyzerServerController.htmlToText(inputLine);
 
-            // extract words from filteredInputLine using StringTokenizer
-            StringTokenizer wordsInLine = new StringTokenizer(filteredInputLine);
+                // extract words from filteredInputLine using StringTokenizer
+                StringTokenizer wordsInLine = new StringTokenizer(filteredInputLine);
 
-            // add words and their frequencies to the database
-            while (wordsInLine.hasMoreTokens()) {
-                String word = wordsInLine.nextToken();
+                // add words and their frequencies to the database
+                while (wordsInLine.hasMoreTokens()) {
+                    String word = wordsInLine.nextToken();
 
-                sql = "SELECT `wordFrequency` FROM " + databaseTable + " WHERE `wordContent`= '" + word.replace("'", "\\'") + "'";
+                    sql = "SELECT `wordFrequency` FROM " + databaseTable + " WHERE `wordContent`= '" + word.replace("'", "\\'") + "'";
 
-                Statement statement = dbConnection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql);
+                    Statement statement = dbConnection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(sql);
 
-                if (resultSet.next()) {
-                    int currentWordFrequency = resultSet.getInt("wordFrequency");
-                    int newWordFrequency = currentWordFrequency + 1;
+                    if (resultSet.next()) {
+                        int currentWordFrequency = resultSet.getInt("wordFrequency");
+                        int newWordFrequency = currentWordFrequency + 1;
 
-                    sql = "UPDATE " + databaseTable + " SET `wordFrequency`=? WHERE `wordContent`=?";
+                        sql = "UPDATE " + databaseTable + " SET `wordFrequency`=? WHERE `wordContent`=?";
 
-                    preparedStatement = dbConnection.prepareStatement(sql);
-                    preparedStatement.setInt(1, newWordFrequency);
-                    preparedStatement.setString(2, word);
-                } else {
-                    sql = "INSERT INTO " + databaseTable + " (`wordContent`, `wordFrequency`) VALUES (?,?)";
+                        preparedStatement = dbConnection.prepareStatement(sql);
+                        preparedStatement.setInt(1, newWordFrequency);
+                        preparedStatement.setString(2, word);
+                    } else {
+                        sql = "INSERT INTO " + databaseTable + " (`wordContent`, `wordFrequency`) VALUES (?,?)";
 
-                    preparedStatement = dbConnection.prepareStatement(sql);
-                    preparedStatement.setString(1, word);
-                    preparedStatement.setInt(2, 1);
+                        preparedStatement = dbConnection.prepareStatement(sql);
+                        preparedStatement.setString(1, word);
+                        preparedStatement.setInt(2, 1);
+                    }
+
+                    preparedStatement.executeUpdate();
                 }
-
-                preparedStatement.executeUpdate();
             }
+
+            urlContent.close();
+
+            closeConnection();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
         }
-
-        urlContent.close();
-
-        closeConnection();
     }
 
     /**
      * Reads all word/frequency pairs from the database.
      *
-     * @throws SQLException If an SQL exception occurs
      */
-    public static ResultSet getAllWords() throws SQLException {
-        dbConnection = dbConnect(databaseName);
+    public static ResultSet getAllWords() {
+        Statement statement = null;
+        ResultSet resultSet = null;
 
-        sql = "SELECT `wordContent`, `wordFrequency` FROM `word` ORDER BY `wordFrequency` DESC";
+        try {
+            dbConnection = dbConnect(databaseName);
 
-        Statement statement = dbConnection.createStatement();
+            sql = "SELECT `wordContent`, `wordFrequency` FROM `word` ORDER BY `wordFrequency` DESC";
 
-        return statement.executeQuery(sql);
+            statement = dbConnection.createStatement();
+
+            resultSet = statement.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultSet;
     }
 
     /**
@@ -208,20 +219,18 @@ public class Database {
         } catch (SQLException se) {
             se.printStackTrace();
         } finally {
-            try {
-                closeConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            closeConnection();
         }
     }
 
     /**
      * Closes the database connection
-     * 
-     * @throws SQLException If an SQL exception occurs
      */
-    public static void closeConnection() throws SQLException {
-        dbConnection.close();
+    public static void closeConnection() {
+        try {
+            dbConnection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

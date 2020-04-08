@@ -32,7 +32,7 @@ public class TextAnalyzerServerController {
 
             // Extract the words from the URL content and insert them into the database
             Database.storeWordsIntoDatabase(targetHtmlContent);
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

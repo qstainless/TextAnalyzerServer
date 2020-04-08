@@ -27,9 +27,14 @@ import java.sql.SQLException;
  */
 public class TextAnalyzerServer {
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    public static void main(String[] args) {
+        System.out.println("TextAnalyzer Server ready. Listening for client request.");
+
+        startServer();
+     }
+
+    public static void startServer() {
         try {
-            System.out.println("TextAnalyzer Server ready. Listening for client request.");
             ServerSocket serverSocket = new ServerSocket(9876);
 
             while (true) {
@@ -42,6 +47,11 @@ public class TextAnalyzerServer {
 
                     // Received the URL from the client
                     String targetUrl = (String) serverIn.readObject();
+
+                    // Exit the program if the user sends 'exit' as the URL
+                    if (targetUrl.equalsIgnoreCase("exit")) {
+                        break;
+                    }
                     System.out.println("\n<== Request received. URL location of file to be parsed: " + targetUrl);
 
                     // Connect to the database. Create the schema if it does not already exist.
@@ -81,19 +91,16 @@ public class TextAnalyzerServer {
 
                     wordPairs.close();
 
+                    // Signal the end of data transmission
+                    serverOut.writeObject(".:done:.");
+
                     System.out.println("\nUnique words: " + uniqueWords + "  Total words: " + totalWords);
                     System.out.println("\n==> Data sent to client. Server ready for next request.");
 
                     serverIn.close();
                     serverOut.close();
                     socket.close();
-
-                    // It never gets to this point as it continues to loop after only
-                    // one click of the 'Analyze!' button.
-                    if (targetUrl.equalsIgnoreCase("exit")) {
-                        break;
-                    }
-                } catch (IOException e) {
+                } catch (IOException | ClassNotFoundException | SQLException e) {
                     e.printStackTrace();
                 }
             }
