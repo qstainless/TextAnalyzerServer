@@ -86,7 +86,7 @@ public class TextAnalyzerServer {
                         int wordFrequency = wordPairs.getInt("wordFrequency");
                         serverOut.writeObject(wordContent);
                         serverOut.writeObject(wordFrequency);
-                        System.out.println(++rank + ". " + wordContent + " (" + wordFrequency + ")");
+                        // System.out.println(++rank + ". " + wordContent + " (" + wordFrequency + ")");
                     }
 
                     wordPairs.close();
@@ -94,8 +94,8 @@ public class TextAnalyzerServer {
                     // Signal the end of data transmission
                     serverOut.writeObject(".:done:.");
 
-                    System.out.println("\nUnique words: " + uniqueWords + "  Total words: " + totalWords);
-                    System.out.println("\n==> Data sent to client. Server ready for next request.");
+                    // System.out.println("\nUnique words: " + uniqueWords + "  Total words: " + totalWords);
+                    System.out.println("\n==> Data sent to client.\n\nTextAnalyzer Server ready for next request.");
 
                     serverIn.close();
                     serverOut.close();
@@ -106,6 +106,10 @@ public class TextAnalyzerServer {
             }
 
             serverSocket.close();
+
+            System.out.println("Client closed connection. Exiting.");
+
+            System.exit(2);
         } catch (IOException e) {
             e.printStackTrace();
         }
