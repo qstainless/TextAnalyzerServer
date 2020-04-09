@@ -33,6 +33,7 @@ public class TextAnalyzerServerController {
             // Extract the words from the URL content and insert them into the database
             Database.storeWordsIntoDatabase(targetHtmlContent);
         } catch (IOException e) {
+            // Should never come to this. URL validation is done client-side
             System.out.println("Error: Invalid URL. Unable to process.");
             e.printStackTrace();
         }
