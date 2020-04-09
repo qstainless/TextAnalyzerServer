@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 /**
  * This is the main controller for the TextAnalyzerServer application.
@@ -70,5 +71,10 @@ public class TextAnalyzerServerController {
                 .replaceAll("[\\[|.?!,;:{}()\\]]", "")
                 .replaceAll("--", " ")
                 .trim();
+    }
+
+    public static String getDateTime() {
+        LocalDateTime dateTime = LocalDateTime.now();
+        return dateTime.toString();
     }
 }

@@ -54,7 +54,11 @@ public class TextAnalyzerServer {
                         break;
                     }
 
-                    System.out.println("\n<== Request received. URL location of file to be parsed: " + targetUrl);
+                    String dateTime = TextAnalyzerServerController.getDateTime();
+
+                    System.out.println("\n<== Request received at " + dateTime + ".");
+                    System.out.println("URL received from client: " + targetUrl);
+                    System.out.print("\nProcessing. This could take a while... ");
 
                     // Connect to the database. Create the schema if it does not already exist.
                     // Truncate the word table
@@ -66,7 +70,8 @@ public class TextAnalyzerServer {
                     int uniqueWords = Database.getUniqueWordCount();
                     int totalWords = Database.getAllWordCount();
 
-                    System.out.println("\nDone parsing URL.");
+                    System.out.println("Done!");
+                    System.out.println("\n==> Sending data to client...");
 
                     ObjectOutputStream serverOut = new ObjectOutputStream(socket.getOutputStream());
 
@@ -92,7 +97,7 @@ public class TextAnalyzerServer {
 
                     wordPairs.close();
 
-                    System.out.println("\n==> Data sent to client.\n\nTextAnalyzer Server ready for next request.");
+                    System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
 
                     serverIn.close();
                     serverOut.close();
