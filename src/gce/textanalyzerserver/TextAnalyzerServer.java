@@ -50,8 +50,10 @@ public class TextAnalyzerServer {
 
                     // Exit the program if the user sends 'exit' as the URL
                     if (targetUrl.equalsIgnoreCase("exit")) {
+                        serverIn.close();
                         break;
                     }
+
                     System.out.println("\n<== Request received. URL location of file to be parsed: " + targetUrl);
 
                     // Connect to the database. Create the schema if it does not already exist.
@@ -86,15 +88,10 @@ public class TextAnalyzerServer {
                         int wordFrequency = wordPairs.getInt("wordFrequency");
                         serverOut.writeObject(wordContent);
                         serverOut.writeObject(wordFrequency);
-                        // System.out.println(++rank + ". " + wordContent + " (" + wordFrequency + ")");
                     }
 
                     wordPairs.close();
 
-                    // Signal the end of data transmission
-                    serverOut.writeObject(".:done:.");
-
-                    // System.out.println("\nUnique words: " + uniqueWords + "  Total words: " + totalWords);
                     System.out.println("\n==> Data sent to client.\n\nTextAnalyzer Server ready for next request.");
 
                     serverIn.close();
@@ -105,9 +102,10 @@ public class TextAnalyzerServer {
                 }
             }
 
+            // Client sent "exit"
             serverSocket.close();
 
-            System.out.println("Client closed connection. Exiting.");
+            System.out.println("\n<== Client closed connection. Exiting.");
 
             System.exit(2);
         } catch (IOException e) {
