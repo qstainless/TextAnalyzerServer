@@ -81,13 +81,10 @@ public class TextAnalyzerServer {
                     // Query the database for the word pairs
                     ResultSet wordPairs = DatabaseController.getAllWords();
 
-                    int rank = 0;
-
                     // Sends each word and its frequency to the outputStream
                     // This worked better and more efficiently than trying to
                     // send the entire ObservableList<Word> because it is not
                     // serializable.
-                    // TODO: move to different method
                     while (wordPairs.next()) {
                         String wordContent = wordPairs.getString("wordContent");
                         int wordFrequency = wordPairs.getInt("wordFrequency");
