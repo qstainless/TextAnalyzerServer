@@ -122,7 +122,7 @@ public class DatabaseController {
      * Reads all word/frequency pairs from the database.
      */
     public static ResultSet getAllWords() {
-        Statement statement = null;
+        Statement statement;
         ResultSet resultSet = null;
 
         try {
