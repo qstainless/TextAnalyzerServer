@@ -18,7 +18,7 @@ public class TextAnalyzerServerController {
      *     calling the {@link TextAnalyzerServerController#fetchUrlContent}
      *     method. URL validation is processed on the client side.</li>
      *     <li>Next, the program will call the
-     *     {@link Database#storeWordsIntoDatabase} method to store the
+     *     {@link DatabaseController#storeWordsIntoDatabase} method to store the
      *     unique words and their frequencies in the database, after
      *     stripping away all HTML tags and some punctuation. </li>
      * </ol>
@@ -31,7 +31,7 @@ public class TextAnalyzerServerController {
             BufferedReader targetHtmlContent = TextAnalyzerServerController.fetchUrlContent(targetUrl);
 
             // Extract the words from the URL content and insert them into the database
-            Database.storeWordsIntoDatabase(targetHtmlContent);
+            DatabaseController.storeWordsIntoDatabase(targetHtmlContent);
         } catch (IOException e) {
             // Should never come to this. URL validation is done client-side
             System.out.println("Error: Invalid URL. Unable to process.");

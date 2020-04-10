@@ -1,6 +1,6 @@
 package gce.textanalyzerserver;
 
-import gce.textanalyzerserver.controller.Database;
+import gce.textanalyzerserver.controller.DatabaseController;
 import gce.textanalyzerserver.controller.TextAnalyzerServerController;
 
 import java.io.IOException;
@@ -62,13 +62,13 @@ public class TextAnalyzerServer {
 
                     // Connect to the database. Create the schema if it does not already exist.
                     // Truncate the word table
-                    Database.createSchema();
+                    DatabaseController.createSchema();
 
                     // Parse the target URL. Save words and their frequencies to the database.
                     TextAnalyzerServerController.processRequest(targetUrl);
 
-                    int uniqueWords = Database.getUniqueWordCount();
-                    int totalWords = Database.getAllWordCount();
+                    int uniqueWords = DatabaseController.getUniqueWordCount();
+                    int totalWords = DatabaseController.getAllWordCount();
 
                     System.out.println("Done!");
                     System.out.println("\n==> Sending data to client...");
@@ -79,7 +79,7 @@ public class TextAnalyzerServer {
                     serverOut.writeObject(totalWords);
 
                     // Query the database for the word pairs
-                    ResultSet wordPairs = Database.getAllWords();
+                    ResultSet wordPairs = DatabaseController.getAllWords();
 
                     int rank = 0;
 

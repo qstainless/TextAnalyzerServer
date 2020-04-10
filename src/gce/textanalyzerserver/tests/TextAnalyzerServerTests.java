@@ -1,6 +1,6 @@
 package gce.textanalyzerserver.tests;
 
-import gce.textanalyzerserver.controller.Database;
+import gce.textanalyzerserver.controller.DatabaseController;
 import gce.textanalyzerserver.controller.TextAnalyzerServerController;
 import org.junit.jupiter.api.*;
 
@@ -19,7 +19,7 @@ class TextAnalyzerServerTests {
     @Order(1)
     @DisplayName("A database connection is successfully created.")
     void testDatabaseConnection() {
-        Connection connection = Database.dbConnect("word_occurrences");
+        Connection connection = DatabaseController.dbConnect("word_occurrences");
         assertNotNull(connection);
     }
 
@@ -27,7 +27,7 @@ class TextAnalyzerServerTests {
     @Order(2)
     @DisplayName("The 'word_occurrences' schema and the 'word' table are created if they don't already exist.")
     void testSchemaAndTableCreation() {
-        Database.createSchema();
+        DatabaseController.createSchema();
     }
 
     @Test
@@ -35,14 +35,14 @@ class TextAnalyzerServerTests {
     @DisplayName("Populates the database with words from http://shakespeare.mit.edu/macbeth/full.html")
     public void testGetData() throws IOException {
         BufferedReader targetHtmlContent = TextAnalyzerServerController.fetchUrlContent("http://shakespeare.mit.edu/macbeth/full.html");
-        Database.storeWordsIntoDatabase(targetHtmlContent);
+        DatabaseController.storeWordsIntoDatabase(targetHtmlContent);
     }
 
     @Test
     @Order(4)
     @DisplayName("Fetches all words from the database.")
     void testGetAllWords() throws SQLException {
-        ResultSet allWords = Database.getAllWords();
+        ResultSet allWords = DatabaseController.getAllWords();
         while (allWords.next()) {
             System.out.println(allWords.getString("wordContent") + ": " + allWords.getInt("wordFrequency"));
         }
@@ -54,7 +54,7 @@ class TextAnalyzerServerTests {
     @Order(5)
     @DisplayName("Verify that the target URL has 3394 unique words.")
     void testGetUniqueWordCount() throws SQLException {
-        int uniqueWords = Database.getUniqueWordCount();
+        int uniqueWords = DatabaseController.getUniqueWordCount();
         assertEquals(3394, uniqueWords);
     }
 
@@ -62,7 +62,7 @@ class TextAnalyzerServerTests {
     @Order(6)
     @DisplayName("Verify that the target URL has 18122 total words.")
     void testGetAllWordCount() throws SQLException {
-        int allWords = Database.getAllWordCount();
+        int allWords = DatabaseController.getAllWordCount();
         assertEquals(18122, allWords);
     }
 
