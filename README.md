@@ -39,6 +39,7 @@ The server application requires no user interaction other than compilation adn e
 To install the program, simply clone the repo, open it in your favorite IDE, and run it. Make sure that Java JDK 8 and JavaFX 8 are installed in your system. For convenience, I have created the files needed for importing the project into Eclipse.
 
 ## Known Issues
+###  HTML to Text conversion
 Not all HTML files are created equal. The program's code to convert HTML files to plain text is still rudimentary, as it is unable to identify HTML tag properties in lines without opening or closing tags.
 
 For example, in the following code:
@@ -64,8 +65,14 @@ The following will be considered as 'words' by the program because the lines do 
 
 That is because the program parses the target URL line by line. Lines that begin with "<" or end with ">" are ignored for purposes of counting words in them. 
 
+### Platforms
+The server/client run from an IDE in macOS, Windows 10 Pro and Linux (Ubuntu 18.04). The client .jar file, however, only runs properly in macOS and Windows 10 Pro. Searching for a solution, Linux would require that Openjfx be installed alongside the JDK (in my case, Amazon Corretto 8). Unfortunately, installing Openjfx was not enough. I may revisit this in the future. 
+
+Execution time was drastically different between macOS (~12s) and Windows 10 Pro (~73). Because I don't typically develop in a Windows environment, I can't explain the difference. The [screenshot](#running-from-the-command-line-(win10)) shows the server and client timestamps and shows the schema and tables properly created. 
+
 ## Todo
-Refactor the `countWordFrequencies` method to detect lines that begin with "<" and ignore all following lines up to and including the next line with a closing ">." Because the parser will ignore the lines, there will be no need to call the `htmlToText` method.
+1. Refactor the `storeWordsIntoDatabase` method to detect lines that begin with "<" and ignore all following lines up to and including the next line with a closing ">." Because the parser will ignore the lines, there will be no need to call the `htmlToText` method. The [Jsoup](https://jsoup.org/) library seems like a viable solution.
+2. Find a way to run the client .jar file in Linux.
 
 ## Version history
 The version numbering of this project does not follow most version numbering guidelines. Instead, it is limited to a two-token concept:
@@ -88,8 +95,10 @@ Version 1.2 - First version
 ![Displaying Results](TextAnalyzer-Screenshot-Server-Client-Results.png)
 ### Program termination
 ![Program Termination](TextAnalyzer-Screenshot-Server-Client-Program-Exit.png)
-### Running from the command line
-![Command Line](TextAnalyzer-Screenshot-Command-Line.png)
+### Running from the command line (macOS)
+![Command Line macOS](TextAnalyzer-Screenshot-Command-Line.png)
+### Running from the command line (Win10)
+![Command Line win10](TextAnalyzer-Screenshot-Server-Client-Win10.png)
 
 ## Unit Tests
 ![Server Unit Tests](TextAnalyzer-Screenshot-Server-Unit-Tests.png)
