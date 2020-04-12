@@ -60,9 +60,6 @@ public class TextAnalyzerServer {
                     System.out.println("URL received from client: " + targetUrl);
                     System.out.print("\nProcessing. This could take a while... ");
 
-                    // Connect to the database. Create the schema if it does not already exist.
-                    // Truncate the word table
-                    DatabaseController.createSchema();
 
                     // Parse the target URL. Save words and their frequencies to the database.
                     TextAnalyzerServerController.processRequest(targetUrl);
