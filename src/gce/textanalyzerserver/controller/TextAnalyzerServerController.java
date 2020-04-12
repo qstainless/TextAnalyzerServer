@@ -1,9 +1,10 @@
 package gce.textanalyzerserver.controller;
 
+import org.jsoup.Jsoup;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.io.StringReader;
 import java.time.LocalDateTime;
 
 /**
@@ -14,9 +15,9 @@ public class TextAnalyzerServerController {
     /**
      * Takes the URL sent by the client and processes it for analysis, as follows:
      * <ol>
-     *     <li>First, it attempts to fetch the content from the URL by
-     *     calling the {@link TextAnalyzerServerController#fetchUrlContent}
-     *     method. URL validation is processed on the client side.</li>
+     *     <li>First, it uses Jsoup to fetch the content from the URL and clean
+     *     up the HTML for better parsing. URL validation is processed on the
+     *     client side.</li>
      *     <li>Next, the program will call the
      *     {@link DatabaseController#storeWordsIntoDatabase} method to store the
      *     unique words and their frequencies in the database, after
@@ -31,27 +32,19 @@ public class TextAnalyzerServerController {
         DatabaseController.createSchema();
 
         try {
-            // Fetch the URL content
-            BufferedReader targetHtmlContent = TextAnalyzerServerController.fetchUrlContent(targetUrl);
+            // Uses the Jsoup library to fetch the targetUrl and create a clean HTML string thereof
+            String targetHtmlContent = Jsoup.connect(targetUrl).get().text();
 
-            // Extract the words from the URL content and insert them into the database
-            DatabaseController.storeWordsIntoDatabase(targetHtmlContent);
+            // Buffer the targetHtmlContent String for parsing
+            BufferedReader bufferedHtmlContent = new BufferedReader(new StringReader(targetHtmlContent));
+
+            // Store the words and their frequencies into the database
+            DatabaseController.storeWordsIntoDatabase(bufferedHtmlContent);
         } catch (IOException e) {
             // Should never come to this. URL validation is done client-side
             System.out.println("Error: Invalid URL. Unable to process.");
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Attempts to fetch the URL provided by the user in the GUI.
-     *
-     * @param targetUrl the target url
-     * @return The buffered URL content
-     * @throws IOException the IO Exception
-     */
-    public static BufferedReader fetchUrlContent(String targetUrl) throws IOException {
-        return new BufferedReader(new InputStreamReader(new URL(targetUrl).openStream()));
     }
 
     /**
@@ -66,9 +59,6 @@ public class TextAnalyzerServerController {
         return inputLine
                 .toLowerCase()
                 .replaceAll(">'", ">")
-                .replaceAll("<.*?>", "")
-                .replaceAll("<.*", "")  // hack to strip unclosed html tags
-                .replaceAll(".*?>", "") // hack to strip unopened html tags
                 .replaceAll(" '", " ")
                 .replaceAll("[!.,]'", "")
                 .replaceAll("[\\[|.?!,;:{}()\\]]", "")

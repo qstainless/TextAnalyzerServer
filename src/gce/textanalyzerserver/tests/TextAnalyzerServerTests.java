@@ -2,10 +2,12 @@ package gce.textanalyzerserver.tests;
 
 import gce.textanalyzerserver.controller.DatabaseController;
 import gce.textanalyzerserver.controller.TextAnalyzerServerController;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,8 +36,9 @@ class TextAnalyzerServerTests {
     @Order(3)
     @DisplayName("Populates the database with words from http://shakespeare.mit.edu/macbeth/full.html")
     public void testGetData() throws IOException {
-        BufferedReader targetHtmlContent = TextAnalyzerServerController.fetchUrlContent("http://shakespeare.mit.edu/macbeth/full.html");
-        DatabaseController.storeWordsIntoDatabase(targetHtmlContent);
+        String targetHtmlContent = Jsoup.connect("http://shakespeare.mit.edu/macbeth/full.html").get().text();
+        BufferedReader bufferedHtmlContent = new BufferedReader(new StringReader(targetHtmlContent));
+        DatabaseController.storeWordsIntoDatabase(bufferedHtmlContent);
     }
 
     @Test
