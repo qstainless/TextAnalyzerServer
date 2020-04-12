@@ -26,6 +26,10 @@ public class TextAnalyzerServerController {
      * @param targetUrl The URL submitted by the client
      */
     public static void processRequest(String targetUrl) {
+        // Connect to the database. Create the schema if it does not already exist.
+        // Truncate the word table
+        DatabaseController.createSchema();
+
         try {
             // Fetch the URL content
             BufferedReader targetHtmlContent = TextAnalyzerServerController.fetchUrlContent(targetUrl);
@@ -72,6 +76,11 @@ public class TextAnalyzerServerController {
                 .trim();
     }
 
+    /**
+     * Gets the current date time to display when a client request is received
+     *
+     * @return The date and time
+     */
     public static String getDateTime() {
         LocalDateTime dateTime = LocalDateTime.now();
         return dateTime.toString();

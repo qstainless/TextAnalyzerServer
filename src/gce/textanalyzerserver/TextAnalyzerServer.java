@@ -26,92 +26,112 @@ import java.sql.SQLException;
  * @since 2020-01-11
  */
 public class TextAnalyzerServer {
+    ServerSocket serverSocket;
+    Socket connection = null;
+    ObjectOutputStream serverOut;
+    ObjectInputStream serverIn;
 
-    public static void main(String[] args) {
-        System.out.println("TextAnalyzer Server ready. Listening for client request.");
+    TextAnalyzerServer() {
+    }
 
-        startServer();
-     }
-
-    public static void startServer() {
+    void run() {
         try {
-            ServerSocket serverSocket = new ServerSocket(9876);
+            serverSocket = new ServerSocket(9876);
 
-            while (true) {
+            // Open the socket to accept requests
+            connection = serverSocket.accept();
 
-                try {
-                    // Open the socket to accept requests
-                    Socket socket = serverSocket.accept();
+            serverIn = new ObjectInputStream(connection.getInputStream());
 
-                    ObjectInputStream serverIn = new ObjectInputStream(socket.getInputStream());
+            // Received the URL from the client
+            String targetUrl = null;
 
-                    // Received the URL from the client
-                    String targetUrl = (String) serverIn.readObject();
-
-                    // Exit the program if the user sends 'exit' as the URL
-                    if (targetUrl.equalsIgnoreCase("exit")) {
-                        serverIn.close();
-                        break;
-                    }
-
-                    String dateTime = TextAnalyzerServerController.getDateTime();
-
-                    System.out.println("\n<== Request received at " + dateTime + ".");
-                    System.out.println("URL received from client: " + targetUrl);
-                    System.out.print("\nProcessing. This could take a while... ");
-
-                    // Connect to the database. Create the schema if it does not already exist.
-                    // Truncate the word table
-                    DatabaseController.createSchema();
-
-                    // Parse the target URL. Save words and their frequencies to the database.
-                    TextAnalyzerServerController.processRequest(targetUrl);
-
-                    int uniqueWords = DatabaseController.getUniqueWordCount();
-                    int totalWords = DatabaseController.getAllWordCount();
-
-                    System.out.println("Done!");
-                    System.out.println("\n==> Sending data to client...");
-
-                    ObjectOutputStream serverOut = new ObjectOutputStream(socket.getOutputStream());
-
-                    serverOut.writeObject(uniqueWords);
-                    serverOut.writeObject(totalWords);
-
-                    // Query the database for the word pairs
-                    ResultSet wordPairs = DatabaseController.getAllWords();
-
-                    // Sends each word and its frequency to the outputStream
-                    // This worked better and more efficiently than trying to
-                    // send the entire ObservableList<Word> because it is not
-                    // serializable.
-                    while (wordPairs.next()) {
-                        String wordContent = wordPairs.getString("wordContent");
-                        int wordFrequency = wordPairs.getInt("wordFrequency");
-                        serverOut.writeObject(wordContent);
-                        serverOut.writeObject(wordFrequency);
-                    }
-
-                    wordPairs.close();
-
-                    System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
-
-                    serverIn.close();
-                    serverOut.close();
-                    socket.close();
-                } catch (IOException | ClassNotFoundException | SQLException e) {
-                    e.printStackTrace();
-                }
+            try {
+                targetUrl = (String) serverIn.readObject();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
 
-            // Client sent "exit"
-            serverSocket.close();
+            // Exit the program if the user sends 'exit' as the URL
+            assert targetUrl != null;
 
-            System.out.println("\n<== Client closed connection. Exiting.");
+            if (targetUrl.equalsIgnoreCase("exit")) {
+                serverIn.close();
+                serverSocket.close();
+                System.out.println("\n<== Client closed connection. Exiting.");
+                System.exit(0);
+            }
 
-            System.exit(2);
+            String dateTime = TextAnalyzerServerController.getDateTime();
+
+            System.out.println("\n<== Request received at " + dateTime + ".");
+            System.out.println("URL received from client: " + targetUrl);
+            System.out.print("\nProcessing. This could take a while... ");
+
+            // Parse the target URL. Save words and their frequencies to the database.
+            TextAnalyzerServerController.processRequest(targetUrl);
+
+            int uniqueWords = 0;
+            int totalWords = 0;
+
+            try {
+                uniqueWords = DatabaseController.getUniqueWordCount();
+                totalWords = DatabaseController.getAllWordCount();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Done!");
+            System.out.println("\n==> Sending data to client...");
+
+            serverOut = new ObjectOutputStream(connection.getOutputStream());
+
+            serverOut.writeObject(uniqueWords);
+            serverOut.writeObject(totalWords);
+
+            /*
+             * Query the database for the word pairs and send them to the
+             * outputStream. This worked better and more efficiently than
+             * trying to send the entire ObservableList<Word> because it
+             * is not serializable.
+             */
+            try {
+                ResultSet wordPairs = DatabaseController.getAllWords();
+
+                while (wordPairs.next()) {
+                    String wordContent = wordPairs.getString("wordContent");
+                    int wordFrequency = wordPairs.getInt("wordFrequency");
+                    serverOut.writeObject(wordContent);
+                    serverOut.writeObject(wordFrequency);
+                }
+
+                wordPairs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                serverIn.close();
+                serverOut.close();
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        TextAnalyzerServer server = new TextAnalyzerServer();
+
+        System.out.println("TextAnalyzer Server ready. Listening for client request.");
+
+        while (true) {
+            server.run();
         }
     }
 }
