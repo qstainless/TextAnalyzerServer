@@ -76,6 +76,11 @@ public class TextAnalyzerServerController {
                 .trim();
     }
 
+    /**
+     * Gets the current date time to display when a client request is received
+     *
+     * @return The date and time
+     */
     public static String getDateTime() {
         LocalDateTime dateTime = LocalDateTime.now();
         return dateTime.toString();
