@@ -20,6 +20,8 @@ As of version 1.7, the program includes unit tests created using Junit.
 ## System requirements
 The program is a JavaFX application using version 8 of Amazon's distribution of the Open Java Development Kit (OpenJDK) [Corretto 8](https://aws.amazon.com/corretto/), which includes JavaFX 8. Unit tests were created using [Junit 5](https://github.com/junit-team/junit5/).
 
+The program requires the [Jsoup](https://jsoup.org) Java HTML parsing library.
+
 ## Database connection defaults
 The program assumes that an existing database user with all database privileges in the local MySQL database with username/password: textanalyzer/textanalyzer. It also assumes that it will connect to localhost using default port 3306. However, the user may change these initial configuration options by editing lines 32 to 35 in the `Database` class: 
 
@@ -64,6 +66,8 @@ The following will be considered as 'words' by the program because the lines do 
 ```
 
 That is because the program parses the target URL line by line. Lines that begin with "<" or end with ">" are ignored for purposes of counting words in them. 
+
+To resolve this issue and to avoid having to reinvent the wheel, I re-implemented the Jsoup library, which creates a clean HTML version of the target URL.
 
 ### Platforms
 The server/client run from an IDE in macOS, Windows 10 Pro and Linux (Ubuntu 18.04). The client .jar file, however, only runs properly in macOS and Windows 10 Pro. Searching for a solution, Linux would require that Openjfx be installed alongside the JDK (in my case, Amazon Corretto 8). Unfortunately, installing Openjfx was not enough. I may revisit this in the future. 
