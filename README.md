@@ -38,7 +38,9 @@ The program assumes that an existing database user with all database privileges 
 The server application requires no user interaction other than compilation adn execution. It must be run before the client application runs.
 
 ## Installation.
-To install the program, simply clone the repo, open it in your favorite IDE, and run it. Make sure that Java JDK 8 and JavaFX 8 are installed in your system. For convenience, I have created the files needed for importing the project into Eclipse.
+Option 1. Clone the server repo, open it in your favorite IDE, and run it. Make sure that Java JDK 8, JavaFX 8, and Junit 5 are installed in your system.
+
+Option 2. Download and run [TextAnalyzerServer.jar](https://github.com/qstainless/TextAnalyzerServer/tree/master/out/artifacts/TextAnalyzerServer).
 
 ## Known Issues
 ###  HTML to Text conversion
