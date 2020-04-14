@@ -49,7 +49,7 @@ public class TextAnalyzerServer {
             try {
                 targetUrl = (String) serverIn.readObject();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                System.out.println("An error occurred while communicating with client.");
             }
 
             // Exit the program if the user sends 'exit' as the URL
@@ -78,46 +78,49 @@ public class TextAnalyzerServer {
                 uniqueWords = DatabaseController.getUniqueWordCount();
                 totalWords = DatabaseController.getAllWordCount();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Database error fetching words and their frequencies from the database.");
             }
 
-            System.out.println("Done!");
-            System.out.println("\n==> Sending data to client...");
+            if (totalWords > 0) {
+                System.out.println("Done!");
+                System.out.println("\n==> Sending data to client...");
 
-            serverOut = new ObjectOutputStream(connection.getOutputStream());
+                serverOut = new ObjectOutputStream(connection.getOutputStream());
 
-            serverOut.writeObject(uniqueWords);
-            serverOut.writeObject(totalWords);
+                serverOut.writeObject(uniqueWords);
+                serverOut.writeObject(totalWords);
 
-            /*
-             * Query the database for the word pairs and send them to the
-             * outputStream. This worked better and more efficiently than
-             * trying to send the entire ObservableList<Word> because it
-             * is not serializable.
-             */
-            try {
-                ResultSet wordPairs = DatabaseController.getAllWords();
+                /*
+                 * Query the database for the word pairs and send them to the
+                 * outputStream. This worked better and more efficiently than
+                 * trying to send the entire ObservableList<Word> because it
+                 * is not serializable.
+                 */
+                try {
+                    ResultSet wordPairs = DatabaseController.getAllWords();
 
-                while (wordPairs.next()) {
-                    String wordContent = wordPairs.getString("wordContent");
-                    int wordFrequency = wordPairs.getInt("wordFrequency");
-                    serverOut.writeObject(wordContent);
-                    serverOut.writeObject(wordFrequency);
+                    while (wordPairs.next()) {
+                        String wordContent = wordPairs.getString("wordContent");
+                        int wordFrequency = wordPairs.getInt("wordFrequency");
+                        serverOut.writeObject(wordContent);
+                        serverOut.writeObject(wordFrequency);
+                    }
+
+                    wordPairs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
 
-                wordPairs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+                System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
 
-            System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
+                serverOut.close();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
                 serverIn.close();
-                serverOut.close();
                 serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();

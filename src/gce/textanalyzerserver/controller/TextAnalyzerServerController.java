@@ -31,19 +31,21 @@ public class TextAnalyzerServerController {
         // Truncate the word table
         DatabaseController.createSchema();
 
-        try {
-            // Uses the Jsoup library to fetch the targetUrl and create a clean HTML string thereof
-            String targetHtmlContent = Jsoup.connect(targetUrl).get().text();
+        // Uses the Jsoup library to fetch the targetUrl and create a clean HTML string thereof
+        String targetHtmlContent = null;
 
+        try {
+            targetHtmlContent = Jsoup.connect(targetUrl).get().text();
+        } catch (IOException e) {
+            System.out.println("Error.\n\n==> The URL sent by the client is invalid.");
+        }
+
+        if (targetHtmlContent != null) {
             // Buffer the targetHtmlContent String for parsing
             BufferedReader bufferedHtmlContent = new BufferedReader(new StringReader(targetHtmlContent));
 
             // Store the words and their frequencies into the database
             DatabaseController.storeWordsIntoDatabase(bufferedHtmlContent);
-        } catch (IOException e) {
-            // Should never come to this. URL validation is done client-side
-            System.out.println("Error: Invalid URL. Unable to process.");
-            e.printStackTrace();
         }
     }
 

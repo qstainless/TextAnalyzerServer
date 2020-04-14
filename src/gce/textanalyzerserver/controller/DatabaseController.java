@@ -114,7 +114,7 @@ public class DatabaseController {
 
             closeConnection();
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            System.out.println("An error occurred trying to store the words and their frequencies into the database.");
         }
     }
 
