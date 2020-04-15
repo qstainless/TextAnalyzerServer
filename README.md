@@ -38,7 +38,7 @@ The program assumes that an existing database user with all database privileges 
 The server application requires no user interaction other than compilation adn execution. It must be run before the client application runs.
 
 ## Installation.
-Option 1. Clone the repo and import it in your favorite IDE. Make sure that:
+Option 1. Clone the repo and import it into your favorite Java IDE. Make sure that:
  1. The project SDK is Java 8 with project language level 8, and
  2. JavaFX 8, Junit 5, [Jsoup](https://jsoup.org), and the Oracle [JDBC Driver](https://dev.mysql.com/downloads/connector/j/) for MySQL are installed in your system.
 
