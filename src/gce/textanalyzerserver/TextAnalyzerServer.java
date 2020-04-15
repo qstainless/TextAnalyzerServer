@@ -108,7 +108,7 @@ public class TextAnalyzerServer {
 
                     wordPairs.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    System.out.println("Database error fetching words and their frequencies from the database.");
                 }
 
                 System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
