@@ -38,9 +38,13 @@ The program assumes that an existing database user with all database privileges 
 The server application requires no user interaction other than compilation adn execution. It must be run before the client application runs.
 
 ## Installation.
-Option 1. Clone the server repo, open it in your favorite IDE, and run it. Make sure that Java JDK 8, JavaFX 8, and Junit 5 are installed in your system.
+Option 1. Clone the repo and import it in your favorite IDE. Make sure that:
+ 1. The project SDK is Java 8 with project language level 8, and
+ 2. JavaFX 8, Junit 5, [Jsoup](https://jsoup.org), and the Oracle [JDBC Driver](https://dev.mysql.com/downloads/connector/j/) for MySQL are installed in your system.
 
 Option 2. Download and run [TextAnalyzerServer.jar](https://github.com/qstainless/TextAnalyzerServer/tree/master/out/artifacts/TextAnalyzerServer).
+
+IMPORTANT: You must run this server BEFORE you run [TextAnalyzerClient](https://github.com/qstainless/TextAnalyzerClient).
 
 ## Known Issues
 ###  HTML to Text conversion
@@ -77,8 +81,9 @@ The server/client run from an IDE in macOS, Windows 10 Pro and Linux (Ubuntu 18.
 Execution time was drastically different between macOS (~12s) and Windows 10 Pro (~73s). Because I don't typically develop in a Windows environment, I can't explain the difference. The [screenshot](#running-from-the-command-line-win10) shows the server and client timestamps and shows the schema and tables properly created. 
 
 ## Todo
-1. Refactor the `storeWordsIntoDatabase` method to detect lines that begin with "<" and ignore all following lines up to and including the next line with a closing ">." Because the parser will ignore the lines, there will be no need to call the `htmlToText` method. The [Jsoup](https://jsoup.org/) library seems like a viable solution.
-2. Find a way to run the client .jar file in Linux.
+~~Refactor the `storeWordsIntoDatabase` method to detect lines that begin with "<" and ignore all following lines up to and including the next line with a closing ">." Because the parser will ignore the lines, there will be no need to call the `htmlToText` method. The [Jsoup](https://jsoup.org/) library seems like a viable solution.~~
+
+Find a way to run the client .jar file in Linux.
 
 ## Version history
 The version numbering of this project does not follow most version numbering guidelines. Instead, it is limited to a two-token concept:
