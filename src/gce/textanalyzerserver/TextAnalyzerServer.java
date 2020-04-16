@@ -36,14 +36,16 @@ public class TextAnalyzerServer {
 
     void run() {
         try {
+            // Create the server socket
             serverSocket = new ServerSocket(9876);
 
             // Open the socket to accept requests
             connection = serverSocket.accept();
 
+            // Create the input stream
             serverIn = new ObjectInputStream(connection.getInputStream());
 
-            // Received the URL from the client
+            // Get the URL sent by the client
             String targetUrl = null;
 
             try {
@@ -62,6 +64,7 @@ public class TextAnalyzerServer {
                 System.exit(0);
             }
 
+            // Get the time and date of the client request
             String dateTime = TextAnalyzerServerController.getDateTime();
 
             System.out.println("\n<== Request received at " + dateTime + ".");
@@ -82,11 +85,14 @@ public class TextAnalyzerServer {
             }
 
             if (totalWords > 0) {
+                // Words were saved in the database. Send data to the client.
                 System.out.println("Done!");
                 System.out.println("\n==> Sending data to client...");
 
+                // Create the output stream
                 serverOut = new ObjectOutputStream(connection.getOutputStream());
 
+                // Send the number of unique and total words
                 serverOut.writeObject(uniqueWords);
                 serverOut.writeObject(totalWords);
 
@@ -113,6 +119,7 @@ public class TextAnalyzerServer {
 
                 System.out.println("Data sent to client.\n\nTextAnalyzer Server ready for next request.");
 
+                // Close the output stream
                 serverOut.close();
             }
 
@@ -120,6 +127,7 @@ public class TextAnalyzerServer {
             e.printStackTrace();
         } finally {
             try {
+                // Close the input stream and socket
                 serverIn.close();
                 serverSocket.close();
             } catch (IOException e) {
@@ -128,11 +136,18 @@ public class TextAnalyzerServer {
         }
     }
 
+    /**
+     * Entry point of the {@code TextAnalyzer} Server application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
+        // Create a new instance of the server
         TextAnalyzerServer server = new TextAnalyzerServer();
 
         System.out.println("TextAnalyzer Server ready. Listening for client request.");
 
+        // Run the server and wait for client input.
         while (true) {
             server.run();
         }
